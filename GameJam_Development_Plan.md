@@ -14,10 +14,10 @@
 
 ## Phase 1: การตั้งค่าเริ่มต้น & การเคลื่อนไหวพื้นฐาน (Core Movement)
 **เป้าหมาย:** สร้างโครงสร้างโปรเจกต์และทำให้ตัวละครขยับได้
-*   [x] **Project Setup:** สร้างโปรเจกต์ Unity 2D (ตั้งค่าโฟลเดอร์ Scripts, Prefabs, Sprites, Sounds)
-*   [x] **Player Placeholder:** สร้างตัวละครชั่วคราว (ใช้รูปทรงเรขาคณิต)
-*   [x] **Top-Down Movement:** เขียนสคริปต์บังคับการเดินแบบ 8 ทิศทาง
-*   [x] **Procedural Animation (Sine Wave):** ใช้ Sine Function ควบคุม Y-axis scale สำหรับ Squash & Stretch และการลอยตัวของอาวุธ (Hovering)
+*   [ ] **Project Setup:** สร้างโปรเจกต์ Unity 2D (ตั้งค่าโฟลเดอร์ Scripts, Prefabs, Sprites, Sounds)
+*   [ ] **Player Placeholder:** สร้างตัวละครชั่วคราว (ใช้รูปทรงเรขาคณิต)
+*   [ ] **Top-Down Movement:** เขียนสคริปต์บังคับการเดินแบบ 8 ทิศทาง
+*   [ ] **Procedural Animation (Sine Wave):** ใช้ Sine Function ควบคุม Y-axis scale สำหรับ Squash & Stretch และการลอยตัวของอาวุธ (Hovering)
 
 ## Phase 2: ระบบการต่อสู้หลัก & กฎของเกม (Combat & Mechanics)
 **เป้าหมาย:** ผู้เล่นสามารถโจมตีได้และระบบ "ทางเลือก" ต้องทำงาน
