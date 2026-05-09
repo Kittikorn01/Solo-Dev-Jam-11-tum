@@ -12,6 +12,15 @@ public class PlayerMovement : MonoBehaviour
     public float bounceSpeed = 15f;   // ความเร็วในการเด้ง (ความถี่คลื่น)
     public float bounceAmount = 0.2f; // ความสูงในการเด้ง (แอมพลิจูด)
 
+    [Header("Dash Settings")]
+    public float dashSpeed = 15f;      // ความเร็วตอนพุ่ง
+    public float dashDuration = 0.2f;  // พุ่งนานแค่ไหน
+    public float dashCooldown = 1f;    // รอคูลดาวน์กี่วินาที
+
+    private float dashCounter;         // ตัวนับเวลาพุ่ง
+    private float dashCoolCounter;     // ตัวนับเวลาคูลดาวน์
+    private Vector2 lastMoveDirection; // เก็บค่าทิศทางล่าสุด
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -26,14 +35,50 @@ public class PlayerMovement : MonoBehaviour
         // แก้ปัญหาเดินเฉียงไวเกินไป
         movementInput = movementInput.normalized;
 
+        // เก็บค่าทิศทางล่าสุดไว้ใช้ตอน Dash (เช็คว่ามีการกดปุ่มทิศทาง)
+        if (movementInput.x != 0 || movementInput.y != 0)
+        {
+            lastMoveDirection = movementInput;
+        }
+
+        // ลอจิกจับเวลา Cooldown ของ Dash
+        if (dashCoolCounter > 0)
+        {
+            dashCoolCounter -= Time.deltaTime;
+        }
+
+        // กดปุ่ม Spacebar เพื่อ Dash (เช็คว่าไม่ได้กำลัง Dash อยู่ และพ้น Cooldown แล้ว)
+        if (Input.GetKeyDown(KeyCode.Space) && dashCoolCounter <= 0 && dashCounter <= 0)
+        {
+            dashCounter = dashDuration;
+        }
+
         // 2. เรียกใช้ระบบ Animation
         HandleProceduralAnimation();
     }
 
     void FixedUpdate()
     {
-        // 3. ขยับตัวละคร (ฟิสิกส์ต้องอยู่ใน FixedUpdate)
-        rb.linearVelocity = movementInput * moveSpeed;
+        // เช็คว่าอยู่ในสถานะ Dash หรือเปล่า
+        if (dashCounter > 0)
+        {
+            // ลบเวลา Dash ลงเรื่อยๆ
+            dashCounter -= Time.fixedDeltaTime;
+
+            // ขยับตัวละครด้วยความเร็ว Dash ในทิศทางล่าสุด
+            rb.linearVelocity = lastMoveDirection * dashSpeed;
+
+            // เมื่อ Dash เสร็จแล้ว ให้เริ่มนับ Cooldown ทันที
+            if (dashCounter <= 0)
+            {
+                dashCoolCounter = dashCooldown;
+            }
+        }
+        else
+        {
+            // ถ้าไม่ได้ Dash ก็เดินปกติ
+            rb.linearVelocity = movementInput * moveSpeed;
+        }
     }
 
     void HandleProceduralAnimation()
