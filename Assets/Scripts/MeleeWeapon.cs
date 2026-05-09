@@ -13,7 +13,6 @@ public class MeleeWeapon : MonoBehaviour
     [Header("Attack Settings")]
     public float swingAngle = 70f; // องศาที่จะง้างและฟาด
     public float attackDuration = 0.15f; // เวลาที่ใช้ฟาด (ยิ่งน้อยยิ่งฟาดเร็ว)
-    public float attackCooldown = 0.5f; // เพิ่ม Cooldown (วินาที)
 
     [Header("Hitbox Settings")]
     public Transform attackPoint; // จุดศูนย์กลางวงกลม (เดี๋ยวเราสร้าง Object มารับ)
@@ -24,6 +23,7 @@ public class MeleeWeapon : MonoBehaviour
     private bool isAttacking = false;
     private Vector3 visualStartPos; // เก็บตำแหน่งตั้งต้นของอาวุธ
 
+    public PlayerStats playerStats;
 
     void Start()
     {
@@ -39,7 +39,7 @@ public class MeleeWeapon : MonoBehaviour
         if (Input.GetMouseButtonDown(0) && !isAttacking && Time.time >= nextAttackTime)
         {
             // เซ็ตเวลาตีครั้งต่อไป = เวลาปัจจุบัน + ระยะเวลา Cooldown
-            nextAttackTime = Time.time + attackCooldown;
+            nextAttackTime = Time.time + playerStats.currentCooldown;
             StartCoroutine(SwingWeapon());
         }
 
@@ -92,6 +92,8 @@ public class MeleeWeapon : MonoBehaviour
         // ล็อกตำแหน่งดาบให้อยู่กับที่
         weaponVisual.localPosition = visualStartPos;
 
+        DetectHits();
+
         // กำหนดองศา: ท่าเตรียม(0) -> ท่าง้างฟาด(70) -> ฟาดลงสุด(-70)
         Quaternion idleRot = Quaternion.identity;
         Quaternion startRot = Quaternion.Euler(0f, 0f, swingAngle);
@@ -126,5 +128,32 @@ public class MeleeWeapon : MonoBehaviour
         // จัดระเบียบให้กลับมาที่ 0 องศาเป๊ะๆ ก่อนจบการตี
         weaponVisual.localRotation = idleRot;
         isAttacking = false;
+    }
+    void DetectHits()
+    {
+        // สร้างวงกลมสแกนหา Collider ทั้งหมดที่อยู่ในเลเยอร์ Enemy
+        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, attackRadius, enemyLayers);
+
+        // วนลูปเช็คว่าสแกนโดนใครบ้าง
+        foreach (Collider2D enemy in hitEnemies)
+        {
+            // ลอจิกสายที่ 1: ตีโดนแล้วเราเสียเลือดเอง
+            if (playerStats.isPower1)
+            {
+                playerStats.TakeDamage(5f); // เสียเลือด 5 หน่วยทุกครั้งที่ตีโดน
+                Debug.Log("Power 1 Active: Damage dealt, HP lost!");
+            }
+
+            // ส่งดาเมจไปที่ศัตรู (สมมติว่าศัตรูมีสคริปต์ EnemyHealth)
+            // enemy.GetComponent<EnemyHealth>().TakeDamage(playerStats.isPower1 ? 50 : 20);
+        }
+    }
+
+    // ฟังก์ชันนี้จะวาดเส้นใน Unity Editor ให้เราเห็นขอบเขต Hitbox
+    void OnDrawGizmosSelected()
+    {
+        if (attackPoint == null) return;
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(attackPoint.position, attackRadius);
     }
 }
