@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
+    private float microDashTimer; // ตัวจับเวลาพุ่งตอนฟันดาบ
+
     [Header("Movement Settings")]
     public float moveSpeed = 5f;
     private Vector2 movementInput;
