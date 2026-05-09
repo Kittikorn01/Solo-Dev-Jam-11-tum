@@ -15,9 +15,15 @@ public class MeleeWeapon : MonoBehaviour
     public float attackDuration = 0.15f; // เวลาที่ใช้ฟาด (ยิ่งน้อยยิ่งฟาดเร็ว)
     public float attackCooldown = 0.5f; // เพิ่ม Cooldown (วินาที)
 
+    [Header("Hitbox Settings")]
+    public Transform attackPoint; // จุดศูนย์กลางวงกลม (เดี๋ยวเราสร้าง Object มารับ)
+    public float attackRadius = 1.5f; // ความกว้างของวงกลมสแกน
+    public LayerMask enemyLayers; // เลเยอร์ของศัตรู (เอาไว้กรองไม่ให้สแกนโดนอย่างอื่น)
+
     private float nextAttackTime = 0f;  // ตัวเก็บเวลาว่าจะตีได้อีกทีตอนไหน
     private bool isAttacking = false;
     private Vector3 visualStartPos; // เก็บตำแหน่งตั้งต้นของอาวุธ
+
 
     void Start()
     {
@@ -83,33 +89,42 @@ public class MeleeWeapon : MonoBehaviour
     {
         isAttacking = true;
 
-        // ดาบกลับมาอยู่ที่ตำแหน่งตั้งต้นเป๊ะๆ ก่อนฟาด (กันมันลอยค้าง)
+        // ล็อกตำแหน่งดาบให้อยู่กับที่
         weaponVisual.localPosition = visualStartPos;
 
-        // กำหนดมุมตั้งต้น (ง้างดาบขึ้น) และมุมจบ (ฟาดดาบลง)
-        // สั่งหมุนเฉพาะแกน Z
+        // กำหนดองศา: ท่าเตรียม(0) -> ท่าง้างฟาด(70) -> ฟาดลงสุด(-70)
+        Quaternion idleRot = Quaternion.identity;
         Quaternion startRot = Quaternion.Euler(0f, 0f, swingAngle);
         Quaternion endRot = Quaternion.Euler(0f, 0f, -swingAngle);
 
+        // จังหวะที่ 1: ง้างดาบปุ๊บฟาดลงทันที (The Slash)
         float elapsedTime = 0f;
-
         while (elapsedTime < attackDuration)
         {
             elapsedTime += Time.deltaTime;
-            // คำนวณเปอร์เซ็นต์เวลา (0 ถึง 1)
             float t = elapsedTime / attackDuration;
 
-            // ใช้คณิตศาสตร์ (Ease-out) ทำให้จังหวะฟาดดูมีน้ำหนัก ไม่แข็งเป็นหุ่นยนต์
-            float smoothT = t * t * (3f - 2f * t);
+            // ใช้สมการ Ease-out แบบพุ่งแรงตอนต้น แล้วชะลอตอนปลาย (ฟีลฟาดดาบหนักๆ)
+            float smoothT = 1f - Mathf.Pow(1f - t, 3f);
 
-            // สั่งหมุน WeaponVisual (ตัวลูก) 
             weaponVisual.localRotation = Quaternion.Slerp(startRot, endRot, smoothT);
-
-            yield return null; // รอเฟรมถัดไป
+            yield return null;
         }
 
-        // คืนดาบกลับสู่สภาพเดิมเมื่อฟาดเสร็จ
-        weaponVisual.localRotation = Quaternion.identity;
+        // จังหวะที่ 2: ดึงดาบกลับท่าเตรียมแบบสมูทๆ (The Recovery)
+        float recoveryTime = 0.15f; // ใช้เวลาดึงดาบกลับนิดนึง จะได้ไม่กระตุก
+        elapsedTime = 0f;
+        while (elapsedTime < recoveryTime)
+        {
+            elapsedTime += Time.deltaTime;
+            float t = elapsedTime / recoveryTime;
+
+            weaponVisual.localRotation = Quaternion.Slerp(endRot, idleRot, t);
+            yield return null;
+        }
+
+        // จัดระเบียบให้กลับมาที่ 0 องศาเป๊ะๆ ก่อนจบการตี
+        weaponVisual.localRotation = idleRot;
         isAttacking = false;
     }
 }
