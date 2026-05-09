@@ -1,7 +1,8 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 /// <summary>
-/// Handles 8-directional player movement and procedural sine-wave animation.
+/// Handles 8-directional player movement using the New Input System and procedural sine-wave animation.
 /// </summary>
 [RequireComponent(typeof(Rigidbody2D))]
 public class PlayerMovement : MonoBehaviour
@@ -31,26 +32,38 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
-        // 1. Gather Input (8-directional)
-        // GetAxisRaw provides instant response (0 or 1), ideal for snappier movements
-        moveInput.x = Input.GetAxisRaw("Horizontal");
-        moveInput.y = Input.GetAxisRaw("Vertical");
+        // 1. Gather Input using New Input System (Simple API)
+        HandleInput();
+
+        // 2. Handle Procedural Animation
+        HandleSineAnimation();
+    }
+
+    private void HandleInput()
+    {
+        var keyboard = Keyboard.current;
+        if (keyboard == null) return; // No keyboard connected
+
+        // Reset input every frame
+        moveInput = Vector2.zero;
+
+        if (keyboard.wKey.isPressed || keyboard.upArrowKey.isPressed) moveInput.y += 1;
+        if (keyboard.sKey.isPressed || keyboard.downArrowKey.isPressed) moveInput.y -= 1;
+        if (keyboard.aKey.isPressed || keyboard.leftArrowKey.isPressed) moveInput.x -= 1;
+        if (keyboard.dKey.isPressed || keyboard.rightArrowKey.isPressed) moveInput.x += 1;
 
         // Normalize to prevent faster diagonal movement
         if (moveInput.sqrMagnitude > 1)
         {
             moveInput.Normalize();
         }
-
-        // 2. Handle Procedural Animation
-        HandleSineAnimation();
     }
 
     private void FixedUpdate()
     {
         // 3. Apply Velocity
-        // Using velocity instead of AddForce for consistent, arcade-like control
-        rb.velocity = moveInput * moveSpeed;
+        // Note: Using rb.linearVelocity for Unity 2023+ (consistent with your current project state)
+        rb.linearVelocity = moveInput * moveSpeed;
     }
 
     /// <summary>
