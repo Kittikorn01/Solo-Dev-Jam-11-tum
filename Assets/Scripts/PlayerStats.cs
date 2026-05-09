@@ -26,9 +26,9 @@ public class PlayerStats : MonoBehaviour
         }
         else if (isPower2)
         {
-            currentDamage = 15f;    // สาย 2: ดาเมจเบาลง
-            currentCooldown = 0.1f; // สาย 2: รัวเมาส์ยับๆ
-            currentAttackDuration = 0.1f;
+            currentDamage = 40f;    // สาย 2: ดาเมจเบาลง
+            currentCooldown = 0.01f; // สาย 2: รัวเมาส์ยับๆ
+            currentAttackDuration = 0.02f;
         }
 
         // ลอจิกของสายที่ 2: ถ้าเลือกสายนี้ เวลาจะลดเร็วขึ้น 2 เท่า
@@ -46,5 +46,19 @@ public class PlayerStats : MonoBehaviour
         {
             Debug.Log("Game Over!");
         }
+    }
+
+    public void Heal(float amount)
+    {
+        currentHP += amount;
+        if (currentHP > 100f) currentHP = 100f; // กันเลือดทะลุหลอด (สมมติ Max HP คือ 100)
+        Debug.Log("Healed! Current HP: " + currentHP);
+    }
+
+    // ฟังก์ชันสำหรับเพิ่มเวลา
+    public void AddTime(float amount)
+    {
+        gameTimer += amount;
+        Debug.Log("Time Added! Current Timer: " + gameTimer);
     }
 }

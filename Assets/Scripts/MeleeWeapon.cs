@@ -12,7 +12,6 @@ public class MeleeWeapon : MonoBehaviour
 
     [Header("Attack Settings")]
     public float swingAngle = 70f; // องศาที่จะง้างและฟาด
-    public float attackDuration = 0.15f; // เวลาที่ใช้ฟาด (ยิ่งน้อยยิ่งฟาดเร็ว)
 
     [Header("Hitbox Settings")]
     public Transform attackPoint; // จุดศูนย์กลางวงกลม (เดี๋ยวเราสร้าง Object มารับ)
@@ -101,10 +100,10 @@ public class MeleeWeapon : MonoBehaviour
 
         // จังหวะที่ 1: ง้างดาบปุ๊บฟาดลงทันที (The Slash)
         float elapsedTime = 0f;
-        while (elapsedTime < attackDuration)
+        while (elapsedTime < playerStats.currentAttackDuration)
         {
             elapsedTime += Time.deltaTime;
-            float t = elapsedTime / attackDuration;
+            float t = elapsedTime / playerStats.currentAttackDuration;
 
             // ใช้สมการ Ease-out แบบพุ่งแรงตอนต้น แล้วชะลอตอนปลาย (ฟีลฟาดดาบหนักๆ)
             float smoothT = 1f - Mathf.Pow(1f - t, 3f);
@@ -137,15 +136,21 @@ public class MeleeWeapon : MonoBehaviour
         // วนลูปเช็คว่าสแกนโดนใครบ้าง
         foreach (Collider2D enemy in hitEnemies)
         {
-            // ลอจิกสายที่ 1: ตีโดนแล้วเราเสียเลือดเอง
-            if (playerStats.isPower1)
-            {
-                playerStats.TakeDamage(5f); // เสียเลือด 5 หน่วยทุกครั้งที่ตีโดน
-                Debug.Log("Power 1 Active: Damage dealt, HP lost!");
-            }
+            EnemyHealth enemyHealth = enemy.GetComponent<EnemyHealth>();
 
-            // ส่งดาเมจไปที่ศัตรู (สมมติว่าศัตรูมีสคริปต์ EnemyHealth)
-            // enemy.GetComponent<EnemyHealth>().TakeDamage(playerStats.isPower1 ? 50 : 20);
+            if (enemyHealth != null)
+            {
+                // ส่งค่า Damage จาก PlayerStats ไปให้ศัตรู
+                enemyHealth.TakeDamage(playerStats.currentDamage);
+                Debug.Log("Hit confirmed on: " + enemy.name);
+
+                // ลอจิกสายที่ 1: ตีโดนแล้วเราเสียเลือดเอง (Everything Has a Cost)
+                if (playerStats.isPower1)
+                {
+                    playerStats.TakeDamage(5f);
+                    Debug.Log("Power 1 Active: Player lost HP due to blood trade!");
+                }
+            }
         }
     }
 
