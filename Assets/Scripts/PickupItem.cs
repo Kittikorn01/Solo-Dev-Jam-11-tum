@@ -14,6 +14,7 @@ public class PickupItem : MonoBehaviour
         // เช็คว่าคนที่มาชนคือ Player ใช่ไหม (อย่าลืมตั้ง Tag ของผู้เล่นว่า "Player" ด้วยนะ)
         if (collision.CompareTag("Player"))
         {
+            Debug.Log("Player picked up an item: " + type.ToString());
             PlayerStats stats = collision.GetComponent<PlayerStats>();
             if (stats != null)
             {
@@ -29,6 +30,10 @@ public class PickupItem : MonoBehaviour
 
                 // สั่งทำลายตัวเองทิ้งหลังเก็บเสร็จ
                 Destroy(gameObject);
+            }
+            else
+            {
+                Debug.LogWarning("PlayerStats component not found on the player!");
             }
         }
     }
