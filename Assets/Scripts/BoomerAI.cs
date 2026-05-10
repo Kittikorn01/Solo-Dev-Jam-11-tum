@@ -25,6 +25,10 @@ public class BoomerAI : MonoBehaviour
     private float angularOffset;
     private Vector3 originalPos;
 
+    [Header("Drop System")]
+    public GameObject healthItemPrefab;
+    public GameObject timeItemPrefab;
+    [Range(0, 100)] public float dropChance = 30f; // โอกาสดรอป 30%
 
     private Transform player;
     private Rigidbody2D rb;
@@ -61,17 +65,16 @@ public class BoomerAI : MonoBehaviour
         }
         else if (distance <= chaseDistance)
         {
-            // เข้า Phase 2: เครื่องติด วิ่งเข้าหาพร้อมสั่น!
-            if (currentState != BoomerState.Chasing)
-            {
-                currentState = BoomerState.Chasing;
-                Debug.Log("Boomer Phase 2: Target Locked. Chasing!");
-            }
-
+            currentState = BoomerState.Chasing;
             MoveTowardsPlayer(chaseSpeed);
 
-            // --- สั่นระริกขณะวิ่ง (Shake) โค้ดอยู่ตรงนี้มันจะทำงานทุกเฟรมที่กำลังวิ่ง ---
-            visualChild.transform.localPosition = originalPos + (Vector3)Random.insideUnitCircle * 0.15f;
+            // เปลี่ยนท่าทาง: เร่งความเร็ว Sine Wave ให้ดุ๊กดิ๊กถี่ขึ้น (สมมติปกติ bobSpeed = 8)
+            float sprintBobSpeed = bobSpeed * 2.5f;
+            sineValue = Mathf.Sin(Time.time * sprintBobSpeed) * bobAmount;
+            visualChild.transform.localScale = new Vector3(defaultScale.x - sineValue, defaultScale.y + sineValue, defaultScale.z);
+
+            // คืนตำแหน่งภาพเป็นจุดศูนย์กลาง (เลิกสั่น)
+            visualChild.transform.localPosition = originalPos;
         }
         else
         {
@@ -104,6 +107,10 @@ public class BoomerAI : MonoBehaviour
     {
         currentState = BoomerState.Fusing;
         rb.linearVelocity = Vector2.zero; // เบรกหัวทิ่ม หยุดอยู่กับที่
+
+        // --- เพิ่มบรรทัดนี้เพื่อให้มันกลับมาเป็นทรงกลม/รูปเดิมทันที ---
+        visualChild.transform.localScale = defaultScale;
+        visualChild.transform.localPosition = originalPos;
 
         Debug.Log("Boomer Phase 3: Fusing! Run away!");
 
@@ -179,6 +186,31 @@ public class BoomerAI : MonoBehaviour
         }
 
         // เดี๋ยว Phase Polish เราค่อยมาใส่ระบบ Particle แตกกระจายตรงนี้นะ
+        Die();
+    }
+
+    void Die()
+    {
+        Debug.Log("Enemy destroyed!");
+        // ทอยเต๋าสุ่มตัวเลข 0 ถึง 100
+        float roll = Random.Range(0f, 100f);
+
+        // ถ้าเลขที่ทอยได้ น้อยกว่าหรือเท่ากับโอกาสดรอป (dropChance) = ดรอปของ!
+        if (roll <= dropChance)
+        {
+            // สุ่มอีกทีว่าจะดรอปอะไร (สุ่ม 0 หรือ 1)
+            int itemTypeRoll = Random.Range(0, 2);
+
+            if (itemTypeRoll == 0 && healthItemPrefab != null)
+            {
+                Instantiate(healthItemPrefab, transform.position, Quaternion.identity); // เสกขวดเลือด
+            }
+            else if (itemTypeRoll == 1 && timeItemPrefab != null)
+            {
+                Instantiate(timeItemPrefab, transform.position, Quaternion.identity); // เสกขวดเวลา
+            }
+        }
+
         Destroy(gameObject);
     }
 
