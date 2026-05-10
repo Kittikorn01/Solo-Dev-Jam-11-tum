@@ -20,14 +20,18 @@ public class PlayerMovement : MonoBehaviour
     private float dashCounter;         // ตัวนับเวลาพุ่ง
     private float dashCoolCounter;     // ตัวนับเวลาคูลดาวน์
     private Vector2 lastMoveDirection; // เก็บค่าทิศทางล่าสุด
+    private PlayerStats stats;
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        stats = GetComponent<PlayerStats>();
     }
 
     void Update()
     {
+        if (stats != null && stats.isDead) return;
+        movementInput.x = Input.GetAxisRaw("Horizontal");
         // 1. รับค่า Input แบบ Snappy (กดปุ๊บเดินปั๊บ ปล่อยปุ๊บหยุดปั๊บ)
         movementInput.x = Input.GetAxisRaw("Horizontal");
         movementInput.y = Input.GetAxisRaw("Vertical");

@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class ChaserAI : MonoBehaviour
 {
-    public enum EnemyState { Chasing, Charging, Lunge, Recovery }
+    public enum EnemyState { Chasing, Charging, Lunge, Recovery} //
     public EnemyState currentState = EnemyState.Chasing;
 
     [Header("Movement")]
@@ -21,6 +21,9 @@ public class ChaserAI : MonoBehaviour
     public float bobSpeed = 12f;     // ความเร็วดุ๊กดิ๊ก
     public float bobAmount = 0.15f;  // ความยืดหด
     private Vector3 defaultScale;    // เก็บสเกลตั้งต้น
+
+    [Header("Combat")]
+    public float attackDamage = 15f; // ความแรงที่พุ่งชน Player
 
     void Start()
     {
@@ -58,6 +61,20 @@ public class ChaserAI : MonoBehaviour
             {
                 StartCoroutine(AttackSequence());
             }
+        }
+        else if (currentState == EnemyState.Recovery)
+        {
+            // ให้มันหายใจหอบ = สั่นเร็วกว่าปกติ (คูณ 1.5) แต่ยืดหดเบาลงนิดนึง (คูณ 0.8)
+            float pantingSpeed = bobSpeed * 1.5f;
+            float pantingAmount = bobAmount * 0.8f;
+            float sineValue = Mathf.Sin(Time.time * pantingSpeed) * pantingAmount;
+
+            // รูปร่างพื้นฐานตอนพักคือ ตัวแบน (Squish) ที่เราทำไว้ใน Coroutine
+            float squishX = defaultScale.x * 1.2f;
+            float squishY = defaultScale.y * 0.8f;
+
+            // เอาทรงแบนๆ มาบวกคลื่น Sine ให้มันกระเพื่อม
+            visualChild.localScale = new Vector3(squishX + sineValue, squishY - sineValue, defaultScale.z);
         }
     }
 
@@ -108,11 +125,56 @@ public class ChaserAI : MonoBehaviour
         currentState = EnemyState.Recovery;
         rb.linearVelocity = Vector2.zero;
 
+        visualChild.localScale = new Vector3(defaultScale.x * 1.2f, defaultScale.y * 0.8f, defaultScale.z);
+
         // คืนสเกลกลับเป็นปกติเพื่อยืนพักเหนื่อย
         visualChild.localScale = defaultScale;
 
         yield return new WaitForSeconds(1f);
 
+        currentState = EnemyState.Chasing;
+    }
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            PlayerStats playerStats = other.GetComponent<PlayerStats>();
+            if (playerStats != null && !playerStats.isDead)
+            {
+                playerStats.TakeDamage(attackDamage);
+
+                if (currentState == EnemyState.Lunge)
+                {
+                    StopAllCoroutines();
+
+                    // เปลี่ยนไปเรียกฟังก์ชันใหม่ที่จัดการเรื่องการถอยและพัก
+                    StartCoroutine(HitBounceRecovery(other.transform));
+                }
+            }
+        }
+    }
+
+    System.Collections.IEnumerator HitBounceRecovery(Transform playerTransform)
+    {
+        currentState = EnemyState.Recovery;
+
+        // 1. ถอยหลังนิดหน่อย (Micro-bounce)
+        Vector2 pushDir = (transform.position - playerTransform.position).normalized;
+        rb.linearVelocity = pushDir * 6f; // ความเร็วถอยเบาๆ (ไม่กระเด็นไกล)
+
+        // 2. เปลี่ยนท่าทางเป็น "หอบเหนื่อย" (Squish)
+        // ทำให้ตัวแบนลง (Y ลด) และบานออกข้าง (X เพิ่ม) 
+        visualChild.localScale = new Vector3(defaultScale.x * 1.2f, defaultScale.y * 0.8f, defaultScale.z);
+
+        // 3. ปล่อยให้มันไถลถอยหลังไปแค่ 0.15 วินาที แล้วเหยียบเบรก
+        yield return new WaitForSeconds(0.15f);
+        rb.linearVelocity = Vector2.zero;
+
+        // 4. ยืนหอบเหนื่อยต่อให้ครบเวลาพัก (สมมติพัก 1 วิ ก็รออีก 0.85 วิ)
+        yield return new WaitForSeconds(0.85f);
+
+        // 5. คืนร่างเดิมและกลับไปวิ่งไล่
+        visualChild.localScale = defaultScale;
         currentState = EnemyState.Chasing;
     }
 }

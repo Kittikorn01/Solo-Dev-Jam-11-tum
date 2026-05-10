@@ -12,10 +12,10 @@ TagManager:
   - 
   - Water
   - UI
-  - Enemy
   - Player
-  - 
-  - 
+  - Enemy
+  - Wall
+  - EnemyBody
   - 
   - 
   - 
@@ -44,6 +44,9 @@ TagManager:
     locked: 0
   - name: Background
     uniqueID: 419132661
+    locked: 0
+  - name: Wall
+    uniqueID: 2353945709
     locked: 0
   - name: GroundFX
     uniqueID: 2269404881
