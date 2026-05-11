@@ -30,6 +30,9 @@ public class BoomerAI : MonoBehaviour
     public GameObject timeItemPrefab;
     [Range(0, 100)] public float dropChance = 30f; // โอกาสดรอป 30%
 
+    [Header("Death Effect")]
+    public GameObject deathEffectPrefab;
+
     private Transform player;
     private Rigidbody2D rb;
 
@@ -204,25 +207,54 @@ public class BoomerAI : MonoBehaviour
     void Die()
     {
         Debug.Log("Enemy destroyed!");
-        // ทอยเต๋าสุ่มตัวเลข 0 ถึง 100
+
+        if (WaveManager.instance != null)
+        {
+            WaveManager.instance.EnemyDied();
+        }
+
+        if (deathEffectPrefab != null)
+        {
+            Instantiate(deathEffectPrefab, transform.position, Quaternion.identity);
+        }
+
         float roll = Random.Range(0f, 100f);
 
-        // ถ้าเลขที่ทอยได้ น้อยกว่าหรือเท่ากับโอกาสดรอป (dropChance) = ดรอปของ!
         if (roll <= dropChance)
         {
-            // สุ่มอีกทีว่าจะดรอปอะไร (สุ่ม 0 หรือ 1)
             int itemTypeRoll = Random.Range(0, 2);
+            GameObject itemPrefab = null;
 
             if (itemTypeRoll == 0 && healthItemPrefab != null)
             {
-                Instantiate(healthItemPrefab, transform.position, Quaternion.identity); // เสกขวดเลือด
+                itemPrefab = healthItemPrefab;
             }
             else if (itemTypeRoll == 1 && timeItemPrefab != null)
             {
-                Instantiate(timeItemPrefab, transform.position, Quaternion.identity); // เสกขวดเวลา
+                itemPrefab = timeItemPrefab;
+            }
+
+            if (itemPrefab != null)
+            {
+                // 1. เสกไอเทมออกมาและเก็บตัวแปรไว้
+                GameObject droppedItem = Instantiate(itemPrefab, transform.position, Quaternion.identity);
+
+                // 2. สั่งให้มันเด้งออก (ต้องมี Rigidbody2D ที่ตัว Item Prefab นะ)
+                Rigidbody2D itemRb = droppedItem.GetComponent<Rigidbody2D>();
+                if (itemRb != null)
+                {
+                    // สุ่มทิศทางแบบ 360 องศา
+                    Vector2 randomDir = new Vector2(Random.Range(-1f, 1f), Random.Range(-1f, 1f)).normalized;
+
+                    // สุ่มแรงดีด (เช่น ระหว่าง 3 ถึง 6)
+                    float force = Random.Range(3f, 6f);
+
+                    // ใช้ ForceMode2D.Impulse เพื่อให้แรงส่งแบบทีเดียวจบ (เหมือนโดนดีด)
+                    itemRb.AddForce(randomDir * force, ForceMode2D.Impulse);
+                }
             }
         }
-        WaveManager.instance.EnemyDied();
+
         Destroy(gameObject);
     }
 

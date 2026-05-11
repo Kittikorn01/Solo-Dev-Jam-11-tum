@@ -221,6 +221,7 @@ MonoBehaviour:
   healthItemPrefab: {fileID: 5280350384450132424, guid: e0928fd0b63103e468f2919c1b4619bc, type: 3}
   timeItemPrefab: {fileID: 2986785825239710570, guid: 71c9a87e65ee1e841830c7f83f0ce2bb, type: 3}
   dropChance: 30
+  deathEffectPrefab: {fileID: 1040609700270969250, guid: 4ddd87d7ad6baf24eb93f7cf37e4a478, type: 3}
 --- !u!50 &919099013454397523
 Rigidbody2D:
   serializedVersion: 5

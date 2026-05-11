@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -23,6 +24,12 @@ public class PlayerStats : MonoBehaviour
     [Header("UI & Game Over")]
     public GameObject gameOverPanel;
 
+    [Header("Visual Effects")]
+    public SpriteRenderer playerVisual; // เอาไว้ลากภาพ Player มาใส่
+
+    [Header("Audio")]
+    public AudioSource hitSound;
+
     void Awake()
     {
         instance = this; // [เพิ่มฟังก์ชันนี้] เซ็ตค่าตอนเริ่มเกม
@@ -37,7 +44,7 @@ public class PlayerStats : MonoBehaviour
         // จัดการสลับค่าพลังตามสายที่เลือกแบบ Real-time
         if (isPower1)
         {
-            currentDamage = 50f;    // สาย 1: ดาเมจสูง
+            currentDamage = 60f;    // สาย 1: ดาเมจสูง
             currentCooldown = 0.6f; // สาย 1: ฟันช้า
             currentAttackDuration = 0.4f;
         }
@@ -50,6 +57,8 @@ public class PlayerStats : MonoBehaviour
 
         // ลอจิกของสายที่ 2: ถ้าเลือกสายนี้ เวลาจะลดเร็วขึ้น 2 เท่า
         float timeMultiplier = isPower2 ? 3f : 1f;
+
+        if(gameTimer > maxTime) gameTimer = maxTime; // กันเวลาเกินหลอด
 
         if (gameTimer > 0 && !isDead && WaveManager.instance != null && WaveManager.instance.isWaveActive)
         {
@@ -67,6 +76,16 @@ public class PlayerStats : MonoBehaviour
         if (isDead) return;
 
         currentHP -= amount;
+
+        if (hitSound != null)
+        {
+            hitSound.Play();
+        }
+
+        if (playerVisual != null)
+        {
+            StartCoroutine(DamageFlashSequence());
+        }
         if (currentHP <= 0)
         {
             currentHP = 0;
@@ -122,5 +141,24 @@ public class PlayerStats : MonoBehaviour
     {
         // โหลด Scene ปัจจุบันซ้ำอีกรอบ (เหมือนกด F5 รีเฟรชเกม)
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    IEnumerator DamageFlashSequence()
+    {
+        // 1. แปลงรหัสสี #9BFF9E เป็นค่า Color ที่ Unity อ่านออก
+        Color myNormalColor;
+        ColorUtility.TryParseHtmlString("#9BFF9E", out myNormalColor);
+
+        // 2. ให้กระพริบ 2 รอบ (แดง -> สีเขียวของนาย -> แดง -> สีเขียวของนาย)
+        for (int i = 0; i < 2; i++)
+        {
+            playerVisual.color = Color.red;
+            yield return new WaitForSeconds(0.1f);
+            playerVisual.color = myNormalColor; // <--- [แก้ตรงนี้] ใช้สีของนายแทนสีขาว
+            yield return new WaitForSeconds(0.1f);
+        }
+
+        // กันเหนียว ตอนจบให้ชัวร์ว่าเป็นสี #9BFF9E ปกติ
+        playerVisual.color = myNormalColor; // <--- [แก้ตรงนี้]
     }
 }

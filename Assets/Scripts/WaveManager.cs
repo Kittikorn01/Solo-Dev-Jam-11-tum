@@ -43,7 +43,10 @@ public class WaveManager : MonoBehaviour
     {
         if (playerStats == null)
             playerStats = FindFirstObjectByType<PlayerStats>();
+    }
 
+    public void BeginGame()
+    {
         StartCoroutine(StartWave());
     }
 
@@ -169,13 +172,24 @@ public class WaveManager : MonoBehaviour
     {
         if (playerStats != null)
         {
-            int minutes = Mathf.FloorToInt(playerStats.gameTimer / 60);
-            int seconds = Mathf.FloorToInt(playerStats.gameTimer % 60);
-            timerText.text = string.Format("{0:00} : {1:00}", minutes, seconds);
+            // 1. เปลี่ยนการแสดงผลเป็นวินาทีอย่างเดียว (จำนวนเต็ม)
+            timerText.text = Mathf.FloorToInt(playerStats.gameTimer).ToString();
+
+            // 2. เช็คสายพลัง Chrono Overdrive (isPower2) เพื่อเปลี่ยนสีตัวอักษรเป็นสีแดง
+            if (playerStats.isPower2)
+            {
+                timerText.color = Color.red;
+            }
+            else
+            {
+                // กลับเป็นสีปกติ (ขาว) เมื่อใช้สาย Juggernaut หรือตอนยังไม่ได้เลือก
+                timerText.color = Color.white;
+            }
         }
 
         if (currentWaveIndex < waves.Length)
         {
+            // อัปเดตจำนวน Enemy ที่กำจัดได้ (เช่น 0 / 5)
             amountText.text = enemiesKilledThisWave + " / " + waves[currentWaveIndex].totalEnemies;
         }
     }
