@@ -44,6 +44,16 @@ public class ChaserAI : MonoBehaviour
         // กันเหนียว เผื่อ Player ตายหรือหาไม่เจอ
         if (player == null) return;
 
+        if (PlayerStats.instance != null && PlayerStats.instance.isDead)
+        {
+            rb.linearVelocity = Vector2.zero; // เหยียบเบรก
+            StopAllCoroutines(); // หยุดการพุ่ง (Lunge) ชาร์จ (Charging) ทั้งหมด
+
+            // ทำให้ตัวหยุดสั่น คืนร่างเดิม
+            visualChild.localScale = defaultScale;
+            return; // ออกจากฟังก์ชันไปเลย ไม่ต้องเดินตามแล้ว
+        }
+
         if (currentState == EnemyState.Chasing)
         {
             // 1. เดินเข้าหาแบบมี Angular Offset (Cheaty AI)
@@ -141,6 +151,7 @@ public class ChaserAI : MonoBehaviour
             PlayerStats playerStats = other.GetComponent<PlayerStats>();
             if (playerStats != null && !playerStats.isDead)
             {
+                Debug.Log("Chaser hit the player!");
                 playerStats.TakeDamage(attackDamage);
 
                 if (currentState == EnemyState.Lunge)

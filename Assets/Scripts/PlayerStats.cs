@@ -1,10 +1,14 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerStats : MonoBehaviour
 {
+    public static PlayerStats instance;
+
     [Header("General Stats")]
-    public float currentHP = 100f;
-    public float gameTimer = 60f; // เวลาของด่าน (วินาที)
+    public float currentHP = 200f;
+    public float maxTime = 60f;
+    public float gameTimer; // เวลาของด่าน (วินาที)
     public bool isDead = false;   // <--- [เพิ่มตรงนี้] ตัวแปรเช็คสถานะความตาย
 
     [Header("Power Selection")]
@@ -15,6 +19,18 @@ public class PlayerStats : MonoBehaviour
     public float currentDamage;
     public float currentCooldown;
     public float currentAttackDuration;
+
+    [Header("UI & Game Over")]
+    public GameObject gameOverPanel;
+
+    void Awake()
+    {
+        instance = this; // [เพิ่มฟังก์ชันนี้] เซ็ตค่าตอนเริ่มเกม
+    }
+    void Start()
+    {
+        gameTimer = maxTime; // โหลดเวลาตั้งต้นตอนเริ่มเกม
+    }
 
     void Update()
     {
@@ -27,21 +43,21 @@ public class PlayerStats : MonoBehaviour
         }
         else if (isPower2)
         {
-            currentDamage = 40f;    // สาย 2: ดาเมจเบาลง
-            currentCooldown = 0.01f; // สาย 2: รัวเมาส์ยับๆ
-            currentAttackDuration = 0.02f;
+            currentDamage = 35f;    // สาย 2: ดาเมจเบาลง
+            currentCooldown = 0.005f; // สาย 2: รัวเมาส์ยับๆ
+            currentAttackDuration = 0.01f;
         }
 
         // ลอจิกของสายที่ 2: ถ้าเลือกสายนี้ เวลาจะลดเร็วขึ้น 2 เท่า
-        float timeMultiplier = isPower2 ? 2f : 1f;
+        float timeMultiplier = isPower2 ? 3f : 1f;
 
-        if (gameTimer > 0 && !isDead)
+        if (gameTimer > 0 && !isDead && WaveManager.instance != null && WaveManager.instance.isWaveActive)
         {
             gameTimer -= Time.deltaTime * timeMultiplier;
             if (gameTimer <= 0)
             {
-                gameTimer = 0; // กันตัวเลขติดลบ
-                Die(); // เวลาหมด = ตาย
+                gameTimer = 0;
+                Die();
             }
         }
     }
@@ -61,7 +77,7 @@ public class PlayerStats : MonoBehaviour
     public void Heal(float amount)
     {
         currentHP += amount;
-        if (currentHP > 100f) currentHP = 100f; // กันเลือดทะลุหลอด (สมมติ Max HP คือ 100)
+        if (currentHP > 200f) currentHP = 200f; // กันเลือดทะลุหลอด (สมมติ Max HP คือ 100)
         Debug.Log("Healed! Current HP: " + currentHP);
     }
 
@@ -93,5 +109,18 @@ public class PlayerStats : MonoBehaviour
         if (movementScript != null) movementScript.enabled = false;
 
         // หมายเหตุ: เดี๋ยวเราค่อยให้ WaveManager มาเช็คค่า isDead จากสคริปต์นี้เพื่อโชว์หน้า UI แพ้
+
+        MeleeWeapon meleeScript = GetComponentInChildren<MeleeWeapon>();
+        if (meleeScript != null) meleeScript.enabled = false;
+
+        if (gameOverPanel != null)
+        {
+            gameOverPanel.SetActive(true);
+        }
+    }
+    public void RestartGame()
+    {
+        // โหลด Scene ปัจจุบันซ้ำอีกรอบ (เหมือนกด F5 รีเฟรชเกม)
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }

@@ -75,7 +75,16 @@ public class PlayerMovement : MonoBehaviour
             // เมื่อ Dash เสร็จแล้ว ให้เริ่มนับ Cooldown ทันที
             if (dashCounter <= 0)
             {
-                dashCoolCounter = dashCooldown;
+                if (stats != null && stats.isPower2)
+                {
+                    // สาย 2: ลดคูลดาวน์ลงครึ่งนึง (คูณ 0.5f) หรือจะใส่เลขไปตรงๆ เช่น 0.3f ก็ได้
+                    dashCoolCounter = dashCooldown * 0.5f;
+                }
+                else
+                {
+                    // สาย 1 (ปกติ): ใช้คูลดาวน์เต็มจำนวน
+                    dashCoolCounter = dashCooldown;
+                }
             }
         }
         else

@@ -146,13 +146,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ChaserAI
   currentState: 0
   moveSpeed: 3
-  lungeSpeed: 15
+  lungeSpeed: 10
   stopDistance: 3
   visualChild: {fileID: 3698468134684389016}
   bobSpeed: 12
   bobAmount: 0.15
-  attackDamage: 15
-  reboundForce: 6
+  attackDamage: 3
 --- !u!114 &3491392135890392155
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -165,11 +164,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 626821d646e75564f9ce0bcf3622eab9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyHealth
-  maxHealth: 60
+  maxHealth: 100
   currentHealth: 0
   healthItemPrefab: {fileID: 5280350384450132424, guid: e0928fd0b63103e468f2919c1b4619bc, type: 3}
   timeItemPrefab: {fileID: 2986785825239710570, guid: 71c9a87e65ee1e841830c7f83f0ce2bb, type: 3}
-  dropChance: 30
+  dropChance: 100
 --- !u!58 &3754784190337704020
 CircleCollider2D:
   m_ObjectHideFlags: 0

@@ -62,7 +62,7 @@ CircleCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -213,14 +213,14 @@ MonoBehaviour:
   chaseDistance: 4.06
   fuseDistance: 1.13
   fuseTime: 2
-  explosionRadius: 3.02
+  explosionRadius: 3
   maxDamage: 80
   visualChild: {fileID: 7409021245469545628}
   bobSpeed: 8
   bobAmount: 0.1
   healthItemPrefab: {fileID: 5280350384450132424, guid: e0928fd0b63103e468f2919c1b4619bc, type: 3}
   timeItemPrefab: {fileID: 2986785825239710570, guid: 71c9a87e65ee1e841830c7f83f0ce2bb, type: 3}
-  dropChance: 25
+  dropChance: 30
 --- !u!50 &919099013454397523
 Rigidbody2D:
   serializedVersion: 5

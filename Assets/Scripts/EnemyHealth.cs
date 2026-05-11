@@ -6,6 +6,9 @@ public class EnemyHealth : MonoBehaviour
     public float maxHealth = 100f;
     [SerializeField] private float currentHealth;
 
+    // [เพิ่มตรงนี้] ตัวล็อคสำคัญ ป้องกันการตายซ้ำซ้อน
+    private bool isDead = false;
+
     [Header("Drop System")]
     public GameObject healthItemPrefab;
     public GameObject timeItemPrefab;
@@ -22,6 +25,8 @@ public class EnemyHealth : MonoBehaviour
     {
         currentHealth -= amount;
 
+        if (isDead) return;
+
         // Log ภาษาอังกฤษตามรีเควสครับ
         Debug.Log("Enemy took " + amount + " damage! HP left: " + currentHealth);
 
@@ -33,7 +38,15 @@ public class EnemyHealth : MonoBehaviour
 
     void Die()
     {
+        isDead = true;
+
         Debug.Log("Enemy destroyed!");
+
+        if (WaveManager.instance != null)
+        {
+            WaveManager.instance.EnemyDied();
+        }
+
         // ทอยเต๋าสุ่มตัวเลข 0 ถึง 100
         float roll = Random.Range(0f, 100f);
 

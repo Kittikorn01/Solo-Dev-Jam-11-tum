@@ -52,6 +52,18 @@ public class BoomerAI : MonoBehaviour
 
         float distance = Vector2.Distance(transform.position, player.position);
 
+        if (PlayerStats.instance != null && PlayerStats.instance.isDead)
+        {
+            rb.linearVelocity = Vector2.zero; // เหยียบเบรก
+            StopAllCoroutines(); // ยกเลิกการนับเวลาบึ้ม (ถ้าระเบิดอยู่)
+
+            // คืนค่าภาพไม่ให้กระพริบแดงหรือยืดหด
+            visualChild.transform.localScale = defaultScale;
+            visualChild.transform.localPosition = originalPos;
+            visualChild.color = Color.white;
+            return; // ออกไปเลย ไม่ต้องทำงานต่อ
+        }
+
         // --- แอนิเมชันดุ๊กดิ๊ก (Sine Wave) เอาไว้ข้างนอกเลย จะได้ดุ๊กดิ๊กตลอดเวลาที่ขยับตัว ---
         float sineValue = Mathf.Sin(Time.time * bobSpeed) * bobAmount;
         visualChild.transform.localScale = new Vector3(defaultScale.x - sineValue, defaultScale.y + sineValue, defaultScale.z);
@@ -210,9 +222,10 @@ public class BoomerAI : MonoBehaviour
                 Instantiate(timeItemPrefab, transform.position, Quaternion.identity); // เสกขวดเวลา
             }
         }
-
+        WaveManager.instance.EnemyDied();
         Destroy(gameObject);
     }
+
 
     // 💡 ทริคแถม: วาดเส้นรัศมีให้เห็นในหน้า Scene ของ Unity จะได้จูนค่าง่ายๆ
     void OnDrawGizmosSelected()
