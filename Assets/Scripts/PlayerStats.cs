@@ -7,7 +7,7 @@ public class PlayerStats : MonoBehaviour
     public static PlayerStats instance;
 
     [Header("General Stats")]
-    public float currentHP = 100f;
+    public float currentHP = 120f;
     public float maxTime = 60f;
     public float gameTimer; // เวลาของด่าน (วินาที)
     public bool isDead = false;   // <--- [เพิ่มตรงนี้] ตัวแปรเช็คสถานะความตาย
@@ -56,7 +56,7 @@ public class PlayerStats : MonoBehaviour
         }
 
         // ลอจิกของสายที่ 2: ถ้าเลือกสายนี้ เวลาจะลดเร็วขึ้น 2 เท่า
-        float timeMultiplier = isPower2 ? 3f : 1f;
+        float timeMultiplier = isPower2 ? 2f : 1f;
 
         if(gameTimer > maxTime) gameTimer = maxTime; // กันเวลาเกินหลอด
 
@@ -96,7 +96,7 @@ public class PlayerStats : MonoBehaviour
     public void Heal(float amount)
     {
         currentHP += amount;
-        if (currentHP > 100f) currentHP = 100f; // กันเลือดทะลุหลอด (สมมติ Max HP คือ 100)
+        if (currentHP > 120f) currentHP = 120f; // กันเลือดทะลุหลอด (สมมติ Max HP คือ 100)
         Debug.Log("Healed! Current HP: " + currentHP);
     }
 

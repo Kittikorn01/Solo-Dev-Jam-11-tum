@@ -213,8 +213,8 @@ MonoBehaviour:
   chaseDistance: 4
   fuseDistance: 1.8
   fuseTime: 1.2
-  explosionRadius: 4
-  maxDamage: 80
+  explosionRadius: 3
+  maxDamage: 60
   visualChild: {fileID: 7409021245469545628}
   bobSpeed: 8
   bobAmount: 0.1

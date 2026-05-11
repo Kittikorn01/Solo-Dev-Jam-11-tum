@@ -212,7 +212,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PickupItem
   type: 0
-  amount: 30
+  amount: 50
 --- !u!50 &9206455262504640077
 Rigidbody2D:
   serializedVersion: 5
