@@ -33,6 +33,9 @@ public class BoomerAI : MonoBehaviour
     [Header("Death Effect")]
     public GameObject deathEffectPrefab;
 
+    [Header("Audio")]
+    public AudioClip explosionSound;
+
     private Transform player;
     private Rigidbody2D rb;
 
@@ -164,6 +167,11 @@ public class BoomerAI : MonoBehaviour
     {
         currentState = BoomerState.Dead;
         Debug.Log("Boomer Phase 4: KABOOM!");
+
+        if (explosionSound != null)
+        {
+            AudioSource.PlayClipAtPoint(explosionSound, Camera.main.transform.position, 1f);
+        }
 
         // ตรวจจับทุกอย่างในรัศมีระเบิด (โดนหมดทั้งมอนและคน)
         Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, explosionRadius);

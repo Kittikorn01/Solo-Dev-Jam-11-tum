@@ -210,18 +210,19 @@ MonoBehaviour:
   currentState: 0
   creepSpeed: 1.5
   chaseSpeed: 5
-  chaseDistance: 4.06
-  fuseDistance: 1.13
-  fuseTime: 2
-  explosionRadius: 3
+  chaseDistance: 4
+  fuseDistance: 1.8
+  fuseTime: 1.2
+  explosionRadius: 4
   maxDamage: 80
   visualChild: {fileID: 7409021245469545628}
   bobSpeed: 8
   bobAmount: 0.1
   healthItemPrefab: {fileID: 5280350384450132424, guid: e0928fd0b63103e468f2919c1b4619bc, type: 3}
   timeItemPrefab: {fileID: 2986785825239710570, guid: 71c9a87e65ee1e841830c7f83f0ce2bb, type: 3}
-  dropChance: 30
+  dropChance: 100
   deathEffectPrefab: {fileID: 1040609700270969250, guid: 4ddd87d7ad6baf24eb93f7cf37e4a478, type: 3}
+  explosionSound: {fileID: 8300000, guid: d3b8342ebb8530c4d9b4609f35eb0eb7, type: 3}
 --- !u!50 &919099013454397523
 Rigidbody2D:
   serializedVersion: 5

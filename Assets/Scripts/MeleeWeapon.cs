@@ -147,7 +147,7 @@ public class MeleeWeapon : MonoBehaviour
                 // ลอจิกสายที่ 1: ตีโดนแล้วเราเสียเลือดเอง (Everything Has a Cost)
                 if (playerStats.isPower1)
                 {
-                    playerStats.TakeDamage(5f);
+                    playerStats.TakeDamage(3f);
                     Debug.Log("Power 1 Active: Player lost HP due to blood trade!");
                 }
             }

@@ -7,7 +7,7 @@ public class PlayerStats : MonoBehaviour
     public static PlayerStats instance;
 
     [Header("General Stats")]
-    public float currentHP = 200f;
+    public float currentHP = 100f;
     public float maxTime = 60f;
     public float gameTimer; // เวลาของด่าน (วินาที)
     public bool isDead = false;   // <--- [เพิ่มตรงนี้] ตัวแปรเช็คสถานะความตาย
@@ -44,14 +44,14 @@ public class PlayerStats : MonoBehaviour
         // จัดการสลับค่าพลังตามสายที่เลือกแบบ Real-time
         if (isPower1)
         {
-            currentDamage = 60f;    // สาย 1: ดาเมจสูง
-            currentCooldown = 0.6f; // สาย 1: ฟันช้า
-            currentAttackDuration = 0.4f;
+            currentDamage = 100f;    // สาย 1: ดาเมจสูง
+            currentCooldown = 0.45f; // สาย 1: ฟันช้า
+            currentAttackDuration = 0.1f;
         }
         else if (isPower2)
         {
             currentDamage = 35f;    // สาย 2: ดาเมจเบาลง
-            currentCooldown = 0.005f; // สาย 2: รัวเมาส์ยับๆ
+            currentCooldown = 0.1f; // สาย 2: รัวเมาส์ยับๆ
             currentAttackDuration = 0.01f;
         }
 
@@ -96,7 +96,7 @@ public class PlayerStats : MonoBehaviour
     public void Heal(float amount)
     {
         currentHP += amount;
-        if (currentHP > 200f) currentHP = 200f; // กันเลือดทะลุหลอด (สมมติ Max HP คือ 100)
+        if (currentHP > 100f) currentHP = 100f; // กันเลือดทะลุหลอด (สมมติ Max HP คือ 100)
         Debug.Log("Healed! Current HP: " + currentHP);
     }
 

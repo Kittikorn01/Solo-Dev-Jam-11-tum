@@ -20,6 +20,9 @@ public class EnemyHealth : MonoBehaviour
     [Header("Visual Effects")]
     public SpriteRenderer enemyVisual;
 
+    [Header("Audio")]
+    public AudioSource hitSound;
+
     void Start()
     {
         // เซ็ตเลือดเต็มตอนเริ่มเกม
@@ -36,6 +39,11 @@ public class EnemyHealth : MonoBehaviour
         if (enemyVisual != null)
         {
             StartCoroutine(HitFlashSequence());
+        }
+
+        if (hitSound != null)
+        {
+            hitSound.Play();
         }
 
         // Log ภาษาอังกฤษตามรีเควสครับ
